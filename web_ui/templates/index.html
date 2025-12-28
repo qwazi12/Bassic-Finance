@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bass-ic Finance - Video Production</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>🎬 Bass-ic Finance</h1>
+                <p>Automated Video Production Studio</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <div class="upload-card" id="scriptUpload">
+                    <div class="upload-icon">📄</div>
+                    <h2>Script File</h2>
+                    <p>Drop your JSON script here</p>
+                    <input type="file" id="scriptFile" accept=".json" hidden>
+                    <button class="upload-btn" onclick="document.getElementById('scriptFile').click()">
+                        Choose File
+                    </button>
+                    <div class="file-name" id="scriptFileName"></div>
+                </div>
+
+                <div class="upload-card" id="styleUpload">
+                    <div class="upload-icon">🎨</div>
+                    <h2>Style Guide (Optional)</h2>
+                    <p>Drop your style instructions here</p>
+                    <input type="file" id="styleFile" accept=".txt,.md,.json" hidden>
+                    <button class="upload-btn secondary" onclick="document.getElementById('styleFile').click()">
+                        Choose File
+                    </button>
+                    <div class="file-name" id="styleFileName"></div>
+                </div>
+            </div>
+
+            <div class="action-section">
+                <button class="produce-btn" id="produceBtn" disabled>
+                    <span class="btn-text">🚀 Start Production</span>
+                    <span class="btn-loader" hidden>⏳ Uploading...</span>
+                </button>
+            </div>
+
+            <div class="progress-section" id="progressSection" hidden>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text" id="progressText">Uploading files...</p>
+            </div>
+
+            <div class="status-section" id="statusSection">
+                <h3>Recent Productions</h3>
+                <div class="status-list" id="statusList">
+                    <p class="empty-state">No productions yet. Upload a script to get started!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
