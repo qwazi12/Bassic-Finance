@@ -1,0 +1,47 @@
+{
+    "title": "Your Life as a Hedge Fund Analyst",
+    "episode_number": 1,
+    "career_type": "hedge_fund_analyst",
+    "duration": 480,
+    "total_scenes": 96,
+    "scenes": [
+        {
+            "scene_number": 1,
+            "timestamp": "0:00-0:05",
+            "duration": 5,
+            "narration": "You wake up at 4:30 AM.",
+            "emotion": "NEUTRAL",
+            "intensity": 0.3,
+            "background_description": "Darkened bedroom with SpongeBob-style curved furniture, soft blue pre-dawn light filtering through porthole window with curtains, alarm clock on nightstand",
+            "background_prompt": "SpongeBob SquarePants style bedroom interior, dark pre-dawn atmosphere, curved organic furniture, porthole window with curtains, soft blue lighting, cozy nightstand, painterly texture, 16:9 aspect ratio",
+            "character_action": "lying in bed, eyes closed, peaceful sleeping position",
+            "character_position": "center frame, horizontal in bed",
+            "character_prompt": "Composite Bass the fish character (from reference) lying peacefully in the SpongeBob-style bed, eyes closed, relaxed sleeping pose. Digital alarm clock showing '4:30 AM' in bright red LED display in foreground. Soft blue ambient light with red glow from clock. Calm, serene mood about to be disrupted.",
+            "pose_id": 7,
+            "expression": "peaceful, sleeping",
+            "camera_angle": "medium shot, slight emphasis on alarm clock in foreground",
+            "lighting": "dim blue ambient with red accent from alarm clock",
+            "color_palette": "#1a1a2e, #16213e, #FF0000",
+            "scene_description": "Bedroom at 4:30 AM, Bass sleeping peacefully, alarm clock about to ring"
+        },
+        {
+            "scene_number": 2,
+            "timestamp": "0:05-0:10",
+            "duration": 5,
+            "narration": "The alarm screams. You silence it.",
+            "emotion": "NEUTRAL",
+            "intensity": 0.4,
+            "background_description": "Same bedroom, now with alarm clock ringing, slight motion blur effect",
+            "background_prompt": "SpongeBob SquarePants style bedroom, same as previous but with visual emphasis on ringing alarm, subtle motion lines, urgency, 16:9",
+            "character_action": "reaching hand toward alarm clock, eyes still mostly closed, groggy",
+            "character_position": "sitting up slightly in bed, arm extended",
+            "character_prompt": "Bass character (from reference) groggily reaching toward alarm clock, eyes half-open with tired expression, arm extended. Alarm clock with vibration lines around it. Interrupted sleep mood.",
+            "pose_id": 4,
+            "expression": "tired, groggy, slightly annoyed",
+            "camera_angle": "close-up on character and alarm clock",
+            "lighting": "increasing light, alarm clock very bright red",
+            "color_palette": "#1a1a2e, #FF0000, #F4C466",
+            "scene_description": "Bass reaching to silence the alarm, groggy and tired"
+        }
+    ]
+}

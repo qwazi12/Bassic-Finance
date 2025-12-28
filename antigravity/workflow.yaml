@@ -1,0 +1,278 @@
+name: bass-ic-finance-video-production
+version: 1.0
+description: |
+  Automated production pipeline for Bass-ic Finance 8-minute videos.
+  Converts JSON scripts into SpongeBob-style animated videos with narration.
+
+# Project configuration
+project:
+  id: manhwa-engine
+  region: us-central1
+
+# Storage buckets
+storage:
+  scripts: bass-ic-scripts
+  references: bass-ic-refs
+  images: bass-ic-images
+  audio: bass-ic-audio
+  videos: bass-ic-videos
+  temp: bass-ic-temp
+
+# Workflow trigger
+trigger:
+  type: cloud_storage
+  bucket: ${storage.scripts}
+  object_pattern: "*.json"
+  events:
+    - OBJECT_FINALIZE
+
+# Global variables
+variables:
+  scenes_per_video: 96
+  duration_per_scene: 5
+  total_duration: 480
+  video_resolution: "1920x1080"
+  video_fps: 24
+  video_format: "mp4"
+
+# Secrets (from Secret Manager)
+secrets:
+  gemini_api_key: gemini-api-key
+  drive_folder_id: drive-folder-id
+  notification_email: notification-email
+
+# Workflow steps
+steps:
+  # ============================================================
+  # STEP 1: Parse Script JSON
+  # ============================================================
+  - name: parse-script
+    type: cloud-function
+    description: "Parse input script and generate scene prompts"
+    runtime: python312
+    entry_point: parse_script_handler
+    memory: 512MB
+    timeout: 300s
+    environment:
+      CHARACTER_REFS_BUCKET: ${storage.references}
+    inputs:
+      script_uri: ${trigger.object}
+      bucket: ${trigger.bucket}
+    outputs:
+      - episode_metadata
+      - scenes  # Array of 96 scene objects
+    
+  # ============================================================
+  # STEP 2: Generate Images (Parallel Batches)
+  # ============================================================
+  - name: generate-images
+    type: parallel
+    description: "Generate all scene images with style consistency"
+    concurrency: 8  # 8 parallel batches
+    retry:
+      max_attempts: 3
+      backoff_multiplier: 2
+    for_each: ${parse-script.outputs.scenes}
+    
+    steps:
+      # Use Gemini 3 Pro Image for all image generation
+      - name: generate-scene-image
+        type: vertex-ai-gemini
+        model: gemini-3-pro-image-preview
+        inputs:
+          prompt: ${item.character_prompt}
+          reference_images:
+            - gs://${storage.references}/character_sheet/pose_${item.pose_id}.png
+          aspect_ratio: "16:9"
+          output_size: "2K"
+          thinking_mode: true
+        outputs:
+          image_url: string
+      
+      # Sub-step 2b: Validate scene accuracy
+      - name: validate-scene
+        type: vertex-ai-gemini
+        model: gemini-3-flash-preview
+        inputs:
+          prompt: |
+            Validate this scene matches the description:
+            ${item.scene_description}
+            
+            Check:
+            1. Character present and correct style
+            2. Background matches description
+            3. Camera angle correct
+            4. No hallucinations
+            
+            Respond with JSON:
+            {
+              "is_valid": true/false,
+              "accuracy_score": 0-100,
+              "issues": []
+            }
+          image_url: ${generate-scene-image.outputs.image_url}
+        outputs:
+          validation_result: object
+      
+      # Sub-step 2c: Handle validation
+      - name: handle-validation
+        type: conditional
+        condition: ${validate-scene.outputs.validation_result.is_valid} == false
+        actions:
+          if_false:
+            - type: retry
+              step: generate-scene-image
+              max_retries: 2
+              modifications:
+                prompt: |
+                  ${item.character_prompt}
+                  
+                  CORRECTIONS NEEDED:
+                  ${validate-scene.outputs.validation_result.issues}
+          if_true:
+            - type: save-to-storage
+              bucket: ${storage.images}
+              path: episode_${parse-script.outputs.episode_metadata.number}/scene_${item.scene_number}.png
+              source: ${generate-scene-image.outputs.image_url}
+  
+  # ============================================================
+  # STEP 3: Generate Audio (Parallel)
+  # ============================================================
+  - name: generate-audio
+    type: parallel
+    description: "Generate narration with Chirp 3 TTS"
+    concurrency: 12
+    retry:
+      max_attempts: 3
+    for_each: ${parse-script.outputs.scenes}
+    
+    steps:
+      - name: synthesize-narration
+        type: google-cloud-speech
+        model: en-US-Chirp-3-Male
+        inputs:
+          text: ${item.narration}
+          emotion: ${item.emotion}
+          emotion_intensity: ${item.intensity}
+          speaking_rate: 0.95
+          pitch: 0.0
+          audio_encoding: MP3
+          sample_rate: 48000
+        outputs:
+          audio_url: string
+      
+      - name: save-audio
+        type: save-to-storage
+        bucket: ${storage.audio}
+        path: episode_${parse-script.outputs.episode_metadata.number}/narration_${item.scene_number}.mp3
+        source: ${synthesize-narration.outputs.audio_url}
+  
+  # ============================================================
+  # STEP 4: Assemble Video
+  # ============================================================
+  - name: assemble-video
+    type: cloud-run
+    description: "Combine images and audio into final video"
+    service: video-assembler
+    region: us-central1
+    timeout: 600s
+    memory: 4Gi
+    cpu: 2
+    inputs:
+      episode_number: ${parse-script.outputs.episode_metadata.number}
+      episode_title: ${parse-script.outputs.episode_metadata.title}
+      images_bucket: ${storage.images}
+      images_path: episode_${parse-script.outputs.episode_metadata.number}/
+      audio_bucket: ${storage.audio}
+      audio_path: episode_${parse-script.outputs.episode_metadata.number}/
+      output_bucket: ${storage.videos}
+      output_filename: ${parse-script.outputs.episode_metadata.title}.mp4
+      total_scenes: ${variables.scenes_per_video}
+      duration_per_scene: ${variables.duration_per_scene}
+      fps: ${variables.video_fps}
+      resolution: ${variables.video_resolution}
+    outputs:
+      video_url: string
+      video_size_mb: number
+      processing_time_seconds: number
+  
+  # ============================================================
+  # STEP 5: Upload to Google Drive
+  # ============================================================
+  - name: upload-to-drive
+    type: google-drive-api
+    description: "Upload final video to shared Drive folder"
+    inputs:
+      file_url: ${assemble-video.outputs.video_url}
+      file_name: ${parse-script.outputs.episode_metadata.title}.mp4
+      folder_id: ${secrets.drive_folder_id}
+      mime_type: video/mp4
+    outputs:
+      drive_file_id: string
+      drive_file_url: string
+  
+  # ============================================================
+  # STEP 6: Send Notification
+  # ============================================================
+  - name: send-notification
+    type: gmail-api
+    description: "Notify team of completed video"
+    inputs:
+      to: ${secrets.notification_email}
+      subject: "✅ Video Ready: ${parse-script.outputs.episode_metadata.title}"
+      body: |
+        Your Bass-ic Finance video is ready!
+        
+        📺 Title: ${parse-script.outputs.episode_metadata.title}
+        🎬 Episode: #${parse-script.outputs.episode_metadata.number}
+        ⏱️ Duration: ${variables.total_duration}s (${variables.scenes_per_video} scenes)
+        📏 Resolution: ${variables.video_resolution} @ ${variables.video_fps}fps
+        💾 File Size: ${assemble-video.outputs.video_size_mb} MB
+        
+        🔗 Google Drive: ${upload-to-drive.outputs.drive_file_url}
+        
+        Production Stats:
+        ⚡ Processing Time: ${assemble-video.outputs.processing_time_seconds}s
+        💰 Estimated Cost: $${calculate_cost()}
+        
+        Ready to publish to YouTube!
+        
+        —
+        Bass-ic Finance Automation System
+      html: true
+
+# Error handling
+error_handling:
+  on_failure:
+    - type: log
+      severity: ERROR
+      message: "Workflow failed: ${error.message}"
+    
+    - type: notification
+      method: email
+      to: ${secrets.notification_email}
+      subject: "❌ Video Production Failed"
+      body: "Error in step: ${error.step}\nMessage: ${error.message}"
+
+# Monitoring
+monitoring:
+  metrics:
+    - name: video_production_duration
+      type: duration
+      unit: seconds
+    
+    - name: image_generation_success_rate
+      type: percentage
+    
+    - name: cost_per_video
+      type: currency
+      unit: USD
+  
+  alerts:
+    - name: production_failure
+      condition: error_count > 0
+      notification: email
+    
+    - name: high_cost
+      condition: cost_per_video > 15
+      notification: email
