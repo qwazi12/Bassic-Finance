@@ -1,0 +1,12 @@
+{
+    "identity_constraints": {
+        "height_lock": "fixed at 4 heads tall",
+        "eye_scale_range": "98% - 102% variation only",
+        "fins_may_never": [
+            "change color",
+            "gain extra fins",
+            "flop dynamically"
+        ],
+        "tie_policy": "default suit MUST include tie unless outfit variant replaces it"
+    }
+}

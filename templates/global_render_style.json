@@ -1,0 +1,11 @@
+{
+    "style_lock": {
+        "art_family": "2D SpongeBob-style cartoon",
+        "line_weight": "clean thick black outlines",
+        "color_type": "flat cel-shaded",
+        "shadow_policy": "minimal, 1 shadow layer max",
+        "texture_policy": "forbidden",
+        "resolution_expectation": "1024x1792 minimum",
+        "model_rule": "all renders MUST inherit this style"
+    }
+}

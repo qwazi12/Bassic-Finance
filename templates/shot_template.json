@@ -1,0 +1,100 @@
+{
+    "shot_template": {
+        "required_fields": [
+            "shot_id",
+            "time_window",
+            "narration_text",
+            "character",
+            "camera",
+            "pose",
+            "expression",
+            "environment",
+            "props",
+            "continuity_reference"
+        ],
+        "camera": {
+            "framing": [
+                "full-body",
+                "medium",
+                "close-up"
+            ],
+            "angle": [
+                "eye-level",
+                "slight_high",
+                "slight_low"
+            ],
+            "view_direction": [
+                "front",
+                "3/4",
+                "profile"
+            ],
+            "movement": "forbidden"
+        },
+        "pose": {
+            "body": "must be explicit (standing, sitting, walking, lying, etc.)",
+            "head": "must be explicit (forward, tilted, down, up, etc.)",
+            "arms": "must be explicit",
+            "legs": "optional but recommended for full-body"
+        },
+        "expression": {
+            "label": "must match one from expression_reference_set",
+            "eyes": "optional override detail",
+            "mouth": "optional override detail"
+        },
+        "environment": {
+            "location": "required (bedroom, office, street, etc.)",
+            "time_of_day": "optional",
+            "details": "list of key background elements"
+        },
+        "props": "list of foreground or held items",
+        "continuity_reference": {
+            "character_turnaround": "bass_master_turnaround.json",
+            "outfit_reference": "one id from outfit_reference_set",
+            "expression_reference": "one id from expression_reference_set"
+        }
+    },
+    "example_shot": {
+        "shot_id": "shot_0003",
+        "time_window": {
+            "start": "00:05.000",
+            "end": "00:10.000",
+            "duration_seconds": 5
+        },
+        "narration_text": "I wake up at 4:30 AM, already tired, staring at my phone.",
+        "character": "Bass",
+        "camera": {
+            "framing": "medium",
+            "angle": "eye-level",
+            "view_direction": "3/4 front"
+        },
+        "pose": {
+            "body": "lying in bed on his side",
+            "head": "propped slightly on pillow, turned toward phone",
+            "arms": "front fin holding glowing phone near face",
+            "legs": "relaxed, under blanket"
+        },
+        "expression": {
+            "label": "tired",
+            "eyes": "half-closed, heavy-lidded",
+            "mouth": "small flat line"
+        },
+        "environment": {
+            "location": "underwater bedroom",
+            "time_of_day": "early morning 4:30 AM",
+            "details": [
+                "soft blue underwater lighting",
+                "digital clock or phone screen showing 4:30 AM",
+                "simple cartoon bed and pillow"
+            ]
+        },
+        "props": [
+            "smartphone with bright screen",
+            "bedside table"
+        ],
+        "continuity_reference": {
+            "character_turnaround": "bass_turnaround_reference.json",
+            "outfit_reference": "outfit_home_pajamas",
+            "expression_reference": "face_tired"
+        }
+    }
+}

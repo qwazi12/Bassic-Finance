@@ -1,0 +1,214 @@
+{
+    "outfit_reference_set": {
+        "character_id": "bass_master_v1",
+        "description": "Neutral full-body outfit variants for Bass, matching a finance-career day-in-the-life lifestyle.",
+        "variants": [
+            {
+                "id": "outfit_business_suit_formal",
+                "role": "corporate office, interviews, presentations",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed",
+                    "head": "forward"
+                },
+                "expression": "neutral",
+                "outfit": {
+                    "jacket": "navy tailored business suit jacket",
+                    "shirt": "white dress shirt",
+                    "tie": "burgundy tie",
+                    "pants": "navy dress trousers",
+                    "shoes": "cartoon dress shoes, black"
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_business_casual",
+                "role": "Friday office wear, startup office scenes, relaxed meetings",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed",
+                    "head": "forward"
+                },
+                "expression": "neutral",
+                "outfit": {
+                    "top": "light blue button-down rolled sleeves",
+                    "bottom": "khaki or grey chinos",
+                    "shoes": "brown loafers"
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_corporate_casual_hoodie_vest",
+                "role": "tech-finance hybrid, quant office style, startup winter mornings",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral"
+                },
+                "expression": "neutral",
+                "outfit": {
+                    "top_layer": "navy quilted finance vest",
+                    "inner_layer": "grey fitted hoodie",
+                    "bottom": "slim dark jeans",
+                    "shoes": "white sneakers"
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_commute_coat",
+                "role": "morning subway / train commute to Wall Street",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed"
+                },
+                "expression": "neutral",
+                "outfit": {
+                    "coat": "charcoal long wool overcoat",
+                    "underlayer": "white shirt, burgundy tie partially visible",
+                    "bottom": "navy trousers",
+                    "props_optional": [
+                        "briefcase",
+                        "coffee cup"
+                    ],
+                    "shoes": "black dress shoes"
+                },
+                "environment": "plain background (subway scene added per shot)"
+            },
+            {
+                "id": "outfit_gym_clothes",
+                "role": "early morning workout",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral"
+                },
+                "expression": "neutral or lightly focused",
+                "outfit": {
+                    "top": "navy or black athletic tank",
+                    "bottom": "dark athletic shorts",
+                    "shoes": "cartoon running sneakers"
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_home_pajamas",
+                "role": "wake-up at 4:30am / sleep scenes",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, relaxed"
+                },
+                "expression": "neutral or sleepy",
+                "outfit": {
+                    "top": "loose long-sleeve pajama shirt, soft pastel color",
+                    "bottom": "matching pajama pants",
+                    "footwear": "none or slippers"
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_weekend_errand",
+                "role": "Saturday errands, Target run, casual breakfast",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright"
+                },
+                "expression": "neutral",
+                "outfit": {
+                    "top": "plain white t-shirt",
+                    "bottom": "navy joggers",
+                    "shoes": "casual sneakers"
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_weekend_social",
+                "role": "dinner date / rooftop social hour / networking drinks",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright"
+                },
+                "expression": "neutral or mild smile",
+                "outfit": {
+                    "top": "black fitted polo or button-down",
+                    "bottom": "dark slim jeans",
+                    "shoes": "brown loafers or stylish sneakers"
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_airport_travel",
+                "role": "client flight, vacation, travel productivity",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright"
+                },
+                "expression": "neutral",
+                "outfit": {
+                    "top_layer": "navy hoodie",
+                    "bottom": "black joggers",
+                    "shoes": "white sneakers",
+                    "props_optional": [
+                        "roller suitcase",
+                        "neck pillow"
+                    ]
+                },
+                "environment": "plain background"
+            },
+            {
+                "id": "outfit_swim_shorts",
+                "role": "vacation or beach day scenes only",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright"
+                },
+                "expression": "neutral or mild smile",
+                "outfit": {
+                    "bottom": "mid-thigh swim shorts, teal",
+                    "footwear": "bare feet"
+                },
+                "environment": "plain background"
+            }
+        ]
+    }
+}
