@@ -1,237 +1,186 @@
 """
-Generate 20 reference poses for Bass (the finance fish character).
-Ensures visual consistency across all episodes.
+Character Sheet Generator
+Creates reference poses for Bass character using Gemini 3 Pro Image.
 """
 
-import os
-import json
-import requests
+import vertexai
+from vertexai.generative_models import GenerativeModel
 from google.cloud import storage
+import os
+import time
 
-# Character base description
+PROJECT_ID = "manhwa-engine"
+LOCATION = "us-central1"
+BUCKET_NAME = "bass-ic-refs"
+
+# Initialize Vertex AI
+vertexai.init(project=PROJECT_ID, location=LOCATION)
+model = GenerativeModel("gemini-3-pro-image-preview")
+
+# Base character description
 BASE_CHARACTER = """
-SpongeBob SquarePants animation style. Main character named Bass is a friendly fish-like humanoid with:
-- Circular yellow-orange head (#F4C466)
-- Large expressive dot eyes (black pupils with white shine)
-- Simple curved line mouth (expression varies by pose)
-- Small oval body wearing navy blue business suit (#1C3A57)
-- White dress shirt with red tie
-- Simplified mitten-style hands (3 fingers each)
-- Short legs with black dress shoes
-- Soft painterly shading with cel-shading highlights
-- Clean black outlines (3px width)
-- Bikini Bottom organic curved aesthetic
-Full body visible, centered in frame.
-Solid light blue background (#E8F4F8) for easy extraction.
-1:1 aspect ratio, 1024x1024 resolution.
+Bass is a fish-like humanoid character in SpongeBob SquarePants animation style.
+
+PHYSICAL FEATURES:
+- Orange/coral colored skin (like a goldfish)
+- Large, expressive eyes with thick black outlines
+- Simple, rounded body shape
+- Wearing a dark business suit with tie
+- Fins instead of hands (but can gesture like hands)
+- Small tail fin
+- SpongeBob-style thick outlines on everything
+
+STYLE REQUIREMENTS:
+- Bright, saturated colors
+- Simple geometric shapes
+- Thick black outlines
+- Minimal shading (cel-shaded look)
+- Cartoon proportions
+- Expressive, exaggerated features
 """
 
-# 20 pose definitions
+# 20 distinct poses
 POSES = [
-    {
-        "id": 0,
-        "name": "neutral_standing",
-        "description": "Front view, arms at sides, calm dot eyes, slight smile, professional posture"
-    },
-    {
-        "id": 1,
-        "name": "happy_smiling",
-        "description": "Front view, wide dot eyes with shine, curved smile, relaxed shoulders"
-    },
-    {
-        "id": 2,
-        "name": "excited",
-        "description": "Front view, extra-wide dot eyes, big curved smile, arms slightly raised, energetic"
-    },
-    {
-        "id": 3,
-        "name": "worried_anxious",
-        "description": "Front view, downturned mouth, slightly narrowed eyes, tense posture, hand near face"
-    },
-    {
-        "id": 4,
-        "name": "stressed_tired",
-        "description": "Front view, half-closed tired eyes, frown, slouched posture, hand rubbing forehead"
-    },
-    {
-        "id": 5,
-        "name": "angry_frustrated",
-        "description": "Front view, furrowed brow lines, downturned frown, clenched fists at sides, tense"
-    },
-    {
-        "id": 6,
-        "name": "shocked_surprised",
-        "description": "Front view, extremely wide eyes, open circular mouth, hands raised in surprise"
-    },
-    {
-        "id": 7,
-        "name": "sleeping",
-        "description": "Side view, eyes closed with peaceful expression, lying down position, relaxed"
-    },
-    {
-        "id": 8,
-        "name": "sitting_desk",
-        "description": "Front view, sitting position, hands resting on desk surface, focused expression"
-    },
-    {
-        "id": 9,
-        "name": "looking_screen",
-        "description": "Three-quarter view, focused on computer screen (not visible), concentrated expression"
-    },
-    {
-        "id": 10,
-        "name": "holding_phone",
-        "description": "Front view, simplified phone shape held to ear, listening expression"
-    },
-    {
-        "id": 11,
-        "name": "drinking_coffee",
-        "description": "Front view, holding coffee mug in both hands, slight smile, relaxed"
-    },
-    {
-        "id": 12,
-        "name": "reading_document",
-        "description": "Front view, holding paper document in hands, reading with focused eyes downward"
-    },
-    {
-        "id": 13,
-        "name": "walking",
-        "description": "Side view, mid-step walking pose, arms swinging naturally, forward motion"
-    },
-    {
-        "id": 14,
-        "name": "pointing",
-        "description": "Front view, right arm extended forward, index finger pointing, assertive expression"
-    },
-    {
-        "id": 15,
-        "name": "celebrating",
-        "description": "Front view, both arms raised above head, big smile, triumphant pose"
-    },
-    {
-        "id": 16,
-        "name": "thinking",
-        "description": "Front view, hand on chin, looking upward, contemplative expression"
-    },
-    {
-        "id": 17,
-        "name": "sad_disappointed",
-        "description": "Front view, downturned curved mouth, droopy eyes, shoulders slumped, dejected"
-    },
-    {
-        "id": 18,
-        "name": "professional_headshot",
-        "description": "Front view, upper body only, perfect business attire, confident slight smile, promotional pose"
-    },
-    {
-        "id": 19,
-        "name": "silhouette",
-        "description": "Front view full body silhouette outline only, solid black fill, no internal details, clear shape"
-    }
+    {"id": 0, "name": "neutral_standing", "description": "Standing straight, neutral expression, arms at sides"},
+    {"id": 1, "name": "pointing_forward", "description": "Pointing forward with one fin, confident expression"},
+    {"id": 2, "name": "thinking", "description": "Hand on chin, looking up thoughtfully"},
+    {"id": 3, "name": "excited_arms_up", "description": "Both arms raised, excited happy expression"},
+    {"id": 4, "name": "sitting_desk", "description": "Sitting at desk, hands folded, professional"},
+    {"id": 5, "name": "walking_confident", "description": "Walking stride, confident posture"},
+    {"id": 6, "name": "explaining_gesturing", "description": "One hand raised explaining, other hand at side"},
+    {"id": 7, "name": "looking_computer", "description": "Looking at computer screen, concentrated"},
+    {"id": 8, "name": "phone_call", "description": "Holding phone to ear"},
+    {"id": 9, "name": "writing_notes", "description": "Looking down, writing on paper"},
+    {"id": 10, "name": "presentation_pointing", "description": "Pointing to side as if presenting chart"},
+    {"id": 11, "name": "crossed_arms", "description": "Arms crossed, serious expression"},
+    {"id": 12, "name": "handshake_ready", "description": "Extending hand for handshake"},
+    {"id": 13, "name": "surprised", "description": "Wide eyes, mouth open in surprise, hands up"},
+    {"id": 14, "name": "disappointed", "description": "Slumped shoulders, looking down sadly"},
+    {"id": 15, "name": "celebrating", "description": "Arms raised in victory, big smile"},
+    {"id": 16, "name": "worried", "description": "Hand on forehead, worried expression"},
+    {"id": 17, "name": "reading_document", "description": "Holding and reading document"},
+    {"id": 18, "name": "coffee_drinking", "description": "Holding coffee cup, casual stance"},
+    {"id": 19, "name": "waving_goodbye", "description": "One arm waving goodbye, friendly smile"},
 ]
 
-def generate_character_pose(pose_data, api_key):
-    """Generate a single character pose using nano-banana-pro."""
+def generate_pose(pose_data):
+    """Generate a specific character pose."""
     
-    full_prompt = f"{BASE_CHARACTER}\n\nPose: {pose_data['description']}"
-    
-    response = requests.post(
-        "https://api. .ai/v1/image/generate",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "model": "nano-banana-pro",
-            "prompt": full_prompt,
-            "aspect_ratio": "1:1",
-            "num_images": 1,
-            "quality": "high"
-        }
-    )
-    
-    if response.status_code == 200:
-        result = response.json()
-        return result['images'][0]['url']
-    else:
-        raise Exception(f"Image generation failed: {response.text}")
+    prompt = f"""
+{BASE_CHARACTER}
 
-def upload_to_gcs(local_path, bucket_name, blob_name):
-    """Upload file to Google Cloud Storage."""
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    blob.upload_from_filename(local_path)
-    print(f"✓ Uploaded {blob_name} to gs://{bucket_name}")
+SPECIFIC POSE: {pose_data['description']}
+
+Requirements:
+- Single character on transparent or simple solid color background
+- Character centered in frame
+- Full body visible
+- SpongeBob SquarePants animation style
+- 1024x1024 resolution
+- High quality, clean lines
+- Consistent with the base character description
+"""
+    
+    print(f"Generating pose {pose_data['id']}: {pose_data['name']}...")
+    
+    try:
+        response = model.generate_content(
+            [prompt],
+            generation_config={
+                "temperature": 0.4,
+                "top_p": 0.95,
+                "max_output_tokens": 8192,
+            }
+        )
+        
+        # Extract image
+        image_bytes = None
+        if response.candidates and len(response.candidates) > 0:
+            candidate = response.candidates[0]
+            if candidate.content and candidate.content.parts:
+                for part in candidate.content.parts:
+                    if hasattr(part, 'inline_data') and part.inline_data:
+                        image_bytes = part.inline_data.data
+                        break
+        
+        if not image_bytes:
+            print(f"❌ No image generated for pose {pose_data['id']}")
+            return None
+        
+        return image_bytes
+        
+    except Exception as e:
+        print(f"❌ Error generating pose {pose_data['id']}: {str(e)}")
+        return None
+
+def upload_to_gcs(image_bytes, pose_id, pose_name):
+    """Upload generated image to Cloud Storage."""
+    
+    try:
+        storage_client = storage.Client(project=PROJECT_ID)
+        bucket = storage_client.bucket(BUCKET_NAME)
+        blob = bucket.blob(f"character_sheet/pose_{pose_id:02d}.png")
+        
+        blob.upload_from_string(image_bytes, content_type='image/png')
+        
+        # Also store metadata
+        metadata_blob = bucket.blob(f"metadata/pose_{pose_id:02d}.json")
+        import json
+        metadata = {
+            "pose_id": pose_id,
+            "name": pose_name,
+            "description": POSES[pose_id]['description']
+        }
+        metadata_blob.upload_from_string(
+            json.dumps(metadata, indent=2),
+            content_type='application/json'
+        )
+        
+        print(f"✅ Uploaded pose {pose_id}: gs://{BUCKET_NAME}/character_sheet/pose_{pose_id:02d}.png")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Upload error for pose {pose_id}: {str(e)}")
+        return False
 
 def main():
-    # Get API key from environment
-    api_key = os.environ.get(' _API_KEY')
-    if not api_key:
-        raise ValueError(" _API_KEY environment variable not set")
+    """Generate all 20 character poses."""
     
-    # Create output directory
-    os.makedirs('character_output', exist_ok=True)
+    print("🎨 Starting character sheet generation...")
+    print(f"📦 Project: {PROJECT_ID}")
+    print(f"🗄️ Bucket: {BUCKET_NAME}")
+    print(f"🎭 Poses to generate: {len(POSES)}\n")
     
-    print("🎨 Generating Bass character reference sheet (20 poses)...")
-    print(f"Model: nano-banana-pro")
-    print(f"Style: SpongeBob SquarePants animation")
-    print()
+    successful = 0
+    failed = 0
     
-    generated_poses = []
-    
-    for pose in POSES:
-        print(f"[{pose['id']:02d}/19] Generating {pose['name']}...")
+    for i, pose in enumerate(POSES):
+        print(f"\n[{i+1}/{len(POSES)}] Processing: {pose['name']}")
         
-        try:
-            image_url = generate_character_pose(pose, api_key)
-            
-            # Download image
-            img_response = requests.get(image_url)
-            local_filename = f"character_output/pose_{pose['id']:02d}_{pose['name']}.png"
-            
-            with open(local_filename, 'wb') as f:
-                f.write(img_response.content)
-            
+        # Generate image
+        image_bytes = generate_pose(pose)
+        
+        if image_bytes:
             # Upload to GCS
-            gcs_path = f"character_sheet/pose_{pose['id']:02d}.png"
-            upload_to_gcs(local_filename, 'bass-ic-refs', gcs_path)
-            
-            generated_poses.append({
-                "id": pose['id'],
-                "name": pose['name'],
-                "description": pose['description'],
-                "gcs_path": f"gs://bass-ic-refs/{gcs_path}",
-                "local_path": local_filename
-            })
-            
-            print(f"  ✓ Success\n")
-            
-        except Exception as e:
-            print(f"  ✗ Error: {e}\n")
-            continue
+            if upload_to_gcs(image_bytes, pose['id'], pose['name']):
+                successful += 1
+            else:
+                failed += 1
+        else:
+            failed += 1
+        
+        # Rate limiting - wait 3 seconds between requests
+        if i < len(POSES) - 1:
+            time.sleep(3)
     
-    # Save metadata
-    metadata = {
-        "character_name": "Bass",
-        "character_description": BASE_CHARACTER,
-        "style": "SpongeBob SquarePants",
-        "total_poses": len(generated_poses),
-        "poses": generated_poses,
-        "version": "1.0",
-        "generated_date": "2025-12-28"
-    }
+    print(f"\n{'='*50}")
+    print(f"✅ Character sheet generation complete!")
+    print(f"   Successful: {successful}")
+    print(f"   Failed: {failed}")
+    print(f"   Total: {len(POSES)}")
+    print(f"{'='*50}\n")
     
-    metadata_path = 'character_output/character_metadata.json'
-    with open(metadata_path, 'w') as f:
-        json.dump(metadata, f, indent=2)
-    
-    upload_to_gcs(metadata_path, 'bass-ic-refs', 'metadata/character_metadata.json')
-    
-    print(f"\n✅ Character sheet generation complete!")
-    print(f"   Generated: {len(generated_poses)}/20 poses")
-    print(f"   Location: gs://bass-ic-refs/character_sheet/")
-    print(f"   Metadata: gs://bass-ic-refs/metadata/character_metadata.json")
+    print(f"📁 View results at: https://console.cloud.google.com/storage/browser/{BUCKET_NAME}/character_sheet")
 
 if __name__ == "__main__":
     main()

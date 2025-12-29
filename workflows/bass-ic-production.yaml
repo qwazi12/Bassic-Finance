@@ -1,0 +1,201 @@
+# Bass-ic Finance Video Production Workflow
+# Google Cloud Workflows orchestration for automated video generation
+
+main:
+  params: [event]
+  steps:
+    # Extract file info from Cloud Storage event
+    - init:
+        assign:
+          - bucket: ${event.data.bucket}
+          - filename: ${event.data.name}
+          - project_id: "manhwa-engine"
+          - region: "us-central1"
+    
+    # Step 1: Parse script with Scene Parser
+    - parse_script:
+        try:
+          call: http.post
+          args:
+            url: https://us-central1-manhwa-engine.cloudfunctions.net/parse-script
+            auth:
+              type: OIDC
+            body:
+              bucket: ${bucket}
+              file: ${filename}
+            timeout: 300
+          result: parsed_result
+        except:
+          as: e
+          steps:
+            - log_parse_error:
+                call: sys.log
+                args:
+                  text: ${"Parse error: " + e.message}
+                  severity: ERROR
+            - return_parse_error:
+                return: ${"Parse failed: " + e.message}
+    
+    - extract_parsed_data:
+        assign:
+          - episode_metadata: ${parsed_result.body.episode_metadata}
+          - scenes: ${parsed_result.body.scenes}
+          - episode_number: ${episode_metadata.number}
+          - total_scenes: ${len(scenes)}
+    
+    - log_start:
+        call: sys.log
+        args:
+          text: ${"Starting production for episode " + string(episode_number) + ": " + episode_metadata.title}
+          severity: INFO
+    
+    # Step 2: Generate images in parallel (batches of 8)
+    - generate_images:
+        parallel:
+          shared: [image_results]
+          concurrency_limit: 8
+          for:
+            value: scene
+            in: ${scenes}
+            steps:
+              - call_image_generator:
+                  try:
+                    call: http.post
+                    args:
+                      url: https://us-central1-manhwa-engine.cloudfunctions.net/generate-image
+                      auth:
+                        type: OIDC
+                      body:
+                        scene_data: ${scene}
+                        episode_number: ${episode_number}
+                      timeout: 300
+                    result: image_result
+                  retry:
+                    predicate: ${http.default_retry_predicate}
+                    max_retries: 3
+                    backoff:
+                      initial_delay: 2
+                      max_delay: 60
+                      multiplier: 2
+              
+              - store_image_result:
+                  assign:
+                    - image_results[scene.scene_number]: ${image_result.body}
+    
+    # Step 3: Generate audio in parallel (batches of 12)
+    - generate_audio:
+        parallel:
+          shared: [audio_results]
+          concurrency_limit: 12
+          for:
+            value: scene
+            in: ${scenes}
+            steps:
+              - call_audio_generator:
+                  try:
+                    call: http.post
+                    args:
+                      url: https://us-central1-manhwa-engine.cloudfunctions.net/generate-audio
+                      auth:
+                        type: OIDC
+                      body:
+                        scene_data: ${scene}
+                        episode_number: ${episode_number}
+                      timeout: 60
+                    result: audio_result
+                  retry:
+                    predicate: ${http.default_retry_predicate}
+                    max_retries: 3
+                    backoff:
+                      initial_delay: 1
+                      max_delay: 30
+                      multiplier: 2
+              
+              - store_audio_result:
+                  assign:
+                    - audio_results[scene.scene_number]: ${audio_result.body}
+    
+    - log_media_complete:
+        call: sys.log
+        args:
+          text: ${"All images and audio generated for episode " + string(episode_number)}
+          severity: INFO
+    
+    # Step 4: Assemble video
+    # Note: Replace VIDEO_ASSEMBLER_URL with actual URL after deploying video-assembler
+    - assemble_video:
+        try:
+          call: http.post
+          args:
+            url: VIDEO_ASSEMBLER_URL/assemble
+            auth:
+              type: OIDC
+            body:
+              episode_number: ${episode_number}
+              episode_title: ${episode_metadata.title}
+              images_bucket: "bass-ic-images"
+              images_path: ${"episode_" + text.substring(text("000" + string(episode_number)), -3, 3) + "/"}
+              audio_bucket: "bass-ic-audio"
+              audio_path: ${"episode_" + text.substring(text("000" + string(episode_number)), -3, 3) + "/"}
+              output_bucket: "bass-ic-videos"
+              output_filename: ${episode_metadata.title + ".mp4"}
+              total_scenes: ${total_scenes}
+              duration_per_scene: 5
+              fps: 24
+              resolution: "1920x1080"
+            timeout: 600
+          result: video_result
+        except:
+          as: e
+          steps:
+            - log_assembly_error:
+                call: sys.log
+                args:
+                  text: ${"Video assembly error: " + e.message}
+                  severity: ERROR
+            - return_assembly_error:
+                return: ${"Assembly failed: " + e.message}
+    
+    - log_video_complete:
+        call: sys.log
+        args:
+          text: ${"Video assembled: " + video_result.body.video_url}
+          severity: INFO
+    
+    # Step 5: Send notification (optional - configure with your webhook)
+    - send_notification:
+        try:
+          call: http.post
+          args:
+            url: SLACK_WEBHOOK_URL
+            headers:
+              Content-Type: "application/json"
+            body:
+              text: |
+                ✅ Video Ready: ${episode_metadata.title}
+                
+                📺 Episode #${episode_number}
+                ⏱️ Duration: 8:00 (${total_scenes} scenes)
+                💾 Size: ${video_result.body.video_size_mb} MB
+                ⚡ Processing Time: ${video_result.body.processing_time_seconds}s
+                
+                📁 Location: ${video_result.body.video_url}
+            timeout: 10
+        except:
+          as: e
+          steps:
+            - log_notification_skip:
+                call: sys.log
+                args:
+                  text: "Notification skipped (configure webhook)"
+                  severity: WARNING
+    
+    # Return final status
+    - return_result:
+        return:
+          status: "success"
+          episode: ${episode_metadata.title}
+          episode_number: ${episode_number}
+          video_url: ${video_result.body.video_url}
+          total_scenes: ${total_scenes}
+          processing_time_seconds: ${video_result.body.processing_time_seconds}
