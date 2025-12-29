@@ -159,7 +159,7 @@ main:
     - log_video_complete:
         call: sys.log
         args:
-          text: ${"Video assembled: " + video_result.body.video_url}
+          text: '$${"Video assembled: " + video_result.body.video_url}'
           severity: INFO
     
     # Step 5: Send notification (optional - configure with your webhook)
