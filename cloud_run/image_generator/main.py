@@ -1,6 +1,6 @@
 """
 Image Generator Cloud Run Service
-Handles heavy ML image generation with Gemini 3 Pro.
+Handles heavy ML image generation with Gemini 3 Pro Image.
 Uses lazy loading to avoid startup timeouts.
 """
 
@@ -35,7 +35,7 @@ def initialize_services():
     
     # Initialize Vertex AI
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    _model = GenerativeModel("gemini-2.0-flash-exp")
+    _model = GenerativeModel("gemini-3-pro-image-preview")
     
     # Initialize storage client
     _storage_client = storage.Client(project=PROJECT_ID)
