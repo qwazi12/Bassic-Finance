@@ -1,6 +1,6 @@
 """
-Enhanced Image Generator with Camera Preset Support
-Generates images and applies camera movements based on preset IDs.
+Enhanced Image Generator with Master Character Profile
+Ensures all generated images use the canonical Bass character design.
 """
 
 import functions_framework
@@ -16,6 +16,43 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 model = GenerativeModel("gemini-3-pro-image-preview")
 storage_client = storage.Client(project=PROJECT_ID)
+
+# Load master character profile
+def load_character_profile():
+    """Load the canonical Bass character profile from GCS."""
+    try:
+        bucket = storage_client.bucket('bass-ic-refs')
+        blob = bucket.blob('templates/bass_character_profile.json')
+        if blob.exists():
+            return json.loads(blob.download_as_text())
+    except:
+        pass
+    return None
+
+CHARACTER_PROFILE = load_character_profile()
+
+# Build character description
+def get_character_description():
+    """Get detailed character description from master profile."""
+    if not CHARACTER_PROFILE:
+        return "Yellow fish character named Bass in SpongeBob style with navy suit"
+    
+    char = CHARACTER_PROFILE['character']
+    colors = char['color_palette']
+    outfit = char['default_outfit']['outfit_items']
+    
+    return f"""
+CHARACTER: {char['name']} - {char['species']}
+BODY: {colors['body_color']} with {colors['underbelly_color']} underbelly
+FINS: {colors['fin_color']} dorsal fin, {colors['arm_color']} arm fins
+EYES: {colors['eye_color']}
+OUTFIT: {outfit['jacket']}, {outfit['shirt']}, {outfit['tie']}
+PROPORTIONS: Short cartoon humanoid (4 heads tall), large rounded head, no neck
+FACIAL: Large oval eyes, simple thin mouth line, no nose or eyebrows
+STYLE: 2D SpongeBob-style cartoon, clean black outlines, flat cel-shaded
+"""
+
+BASS_CHARACTER = get_character_description()
 
 # Camera preset framing instructions
 CAMERA_FRAMING = {
@@ -35,7 +72,7 @@ CAMERA_FRAMING = {
 
 @functions_framework.http
 def generate_image(request):
-    """Generate scene image with camera preset framing."""
+    """Generate scene image with master character profile and camera framing."""
     
     request_json = request.get_json(silent=True)
     
@@ -65,12 +102,15 @@ def generate_image(request):
         # Get camera framing instruction
         framing = CAMERA_FRAMING.get(camera_preset, CAMERA_FRAMING['static_mid'])
         
-        # Build comprehensive prompt
+        # Build comprehensive prompt with master profile
         prompt = f"""
 Create a scene in SpongeBob SquarePants animation style.
 
-CHARACTER & POSE:
-Use the character (Bass) from the reference image in the exact pose shown.
+{BASS_CHARACTER}
+
+CHARACTER POSE:
+Use the exact character from the reference image in the exact pose shown.
+CRITICAL: Maintain character identity - same colors, proportions, outfit, and style.
 
 CAMERA FRAMING:
 {framing}
@@ -86,13 +126,16 @@ SCENE CONTEXT:
 
 STYLE REQUIREMENTS:
 - SpongeBob SquarePants aesthetic: bright saturated colors, thick black outlines, simple shapes
-- Match character design exactly from reference
-- 16:9 aspect ratio
-- 2K resolution
-- Professional animation quality
-- Clear, clean composition suitable for the specified camera framing
+- Match character design EXACTLY from reference and master profile
+- 16:9 aspect ratio, 2K resolution
+- Flat cel-shaded animation aesthetic
+- Minimal shading, clean professional quality
+- Frame according to "{camera_preset}" preset
 
-CRITICAL: Frame the shot according to "{camera_preset}" preset ({framing})
+CRITICAL RULES:
+1. Character identity is LOCKED - exact colors and design from reference
+2. No modifications to character appearance
+3. Only pose and environment vary
 """
         
         # Create image part from reference
@@ -105,7 +148,7 @@ CRITICAL: Frame the shot according to "{camera_preset}" preset ({framing})
         response = model.generate_content(
             [prompt, image_part],
             generation_config={
-                "temperature": 0.4,
+                "temperature": 0.3,  # Lower for character consistency
                 "top_p": 0.95,
                 "max_output_tokens": 8192,
             }
@@ -133,7 +176,8 @@ CRITICAL: Frame the shot according to "{camera_preset}" preset ({framing})
         output_blob.metadata = {
             'pose_id': str(pose_id),
             'camera_preset': camera_preset,
-            'environment': shot_data.get('environment', '')
+            'environment': shot_data.get('environment', ''),
+            'profile_version': '1.0'
         }
         
         output_blob.upload_from_string(image_bytes, content_type='image/png')

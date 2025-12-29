@@ -1,0 +1,62 @@
+{
+    "character": {
+        "name": "Bass",
+        "species": "fish-like humanoid (cartoon)",
+        "age_category": "young adult (approx. 25 human equivalent)",
+        "gender_expression": "male",
+        "identity_locked": true,
+        "model_sheet_reference": "full body neutral baseline",
+        "anatomy": {
+            "overall_form": "upright bipedal fish-like humanoid",
+            "proportions": {
+                "height_type": "short cartoon humanoid (approx. 4 heads tall)",
+                "head_size_ratio": "large rounded elongated head (~25% of total height)",
+                "torso": "simple cylindrical torso",
+                "legs": "short rounded legs ending in fin-like feet",
+                "arms": "rounded fin-like arms, mid-torso length",
+                "shoulders": "narrow and slightly sloped",
+                "neck": "none (head attaches directly to torso)"
+            }
+        },
+        "color_palette": {
+            "body_color": "flat yellow",
+            "underbelly_color": "muted tan vertical stripe down torso",
+            "fin_color": "navy blue running from top of head down spine",
+            "arm_color": "yellow-green fins",
+            "eye_color": "black pupils, white sclera"
+        },
+        "facial_structure": {
+            "eyes": "large oval cartoon eyes",
+            "mouth": "simple thin horizontal line",
+            "nose": "none (cartoon style)",
+            "brows": "no drawn eyebrows by default"
+        },
+        "default_outfit": {
+            "industry_context": "high finance",
+            "clothing_style": "business professional",
+            "outfit_items": {
+                "jacket": "navy tailored business suit jacket",
+                "shirt": "white dress shirt",
+                "tie": "burgundy tie",
+                "pants": "navy business trousers",
+                "shoes": "simple cartoon dress shoes (navy or black)"
+            }
+        }
+    },
+    "render_style": {
+        "art": "2D SpongeBob-style cartoon",
+        "lines": "clean black outlines",
+        "color_render": "flat cel-shaded animation aesthetic",
+        "shading": "minimal",
+        "lighting": "neutral soft",
+        "aspect_ratio": "16:9"
+    },
+    "rules": {
+        "pose_is_not_defined_here": true,
+        "expression_is_not_defined_here": true,
+        "camera_is_not_defined_here": true,
+        "environment_is_not_defined_here": true,
+        "no_action_or_gesture_defined": true,
+        "this_JSON_is_for_identity_only": true
+    }
+}
