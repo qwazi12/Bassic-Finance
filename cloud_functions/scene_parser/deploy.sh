@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_ID="bass-ic-finance-prod"
+PROJECT_ID="manhwa-engine"
 FUNCTION_NAME="parse-script"
 REGION="us-central1"
 
