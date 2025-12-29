@@ -1,0 +1,111 @@
+{
+    "rules": {
+        "determinism": true,
+        "no_inference": true,
+        "no_defaults_if_image_is_allowed": true,
+        "never_invent_attributes": true,
+        "output_only_json": true
+    },
+    "reference_image_policy": {
+        "mode": "cartoon_character_identity",
+        "used": true,
+        "represents_full_character_identity": true,
+        "image_locked_attributes": [
+            "body_shape",
+            "species",
+            "base_color_palette",
+            "fin_shape",
+            "face_geometry",
+            "eye_shape"
+        ]
+    },
+    "character": {
+        "name": {
+            "value": "Bass"
+        },
+        "species": {
+            "source": "image_locked"
+        },
+        "identity": {
+            "body_shape": {
+                "source": "image_locked"
+            },
+            "fin_shape": {
+                "source": "image_locked"
+            },
+            "base_color_palette": {
+                "source": "image_locked"
+            },
+            "eye_shape": {
+                "source": "image_locked"
+            }
+        },
+        "clothing": {
+            "allowed_sources": [
+                "text"
+            ],
+            "example_rule": "If suit is provided in text, suit must render exactly that suit; if absent, character is unclothed by default"
+        }
+    },
+    "pose": {
+        "allowed_sources": [
+            "text",
+            "image"
+        ],
+        "must_be_explicit": true,
+        "forbidden": [
+            "assumed natural default pose"
+        ]
+    },
+    "expression": {
+        "allowed_sources": [
+            "text",
+            "image"
+        ],
+        "must_be_explicit": true
+    },
+    "environment": {
+        "allowed_sources": [
+            "text"
+        ],
+        "default_source": "blank underwater gradient"
+    },
+    "camera": {
+        "framing": {
+            "allowed_sources": [
+                "text"
+            ],
+            "default": "mid-shot"
+        },
+        "angle": {
+            "allowed_sources": [
+                "text"
+            ],
+            "default": "eye-level"
+        }
+    },
+    "lighting": {
+        "allowed_sources": [
+            "text"
+        ],
+        "default": "flat cartoon lighting"
+    },
+    "style": {
+        "render_type": {
+            "allowed_sources": [
+                "text"
+            ],
+            "must_be_explicit": true,
+            "example_values": [
+                "2D SpongeBob-style animation",
+                "cel-shaded 2D TV-cartoon look"
+            ]
+        }
+    },
+    "forbidden_operations": [
+        "aging character",
+        "changing species",
+        "changing fish-body identity",
+        "adding realism or 3D depth unless explicitly requested"
+    ]
+}

@@ -1,0 +1,83 @@
+{
+    "detailed_poses": [
+        {
+            "id": "thinking_fist_to_mouth",
+            "pose_number": 3,
+            "character": "Bass",
+            "camera": {
+                "view": "3/4 angle",
+                "framing": "mid-shot",
+                "angle": "eye-level",
+                "motion": "static"
+            },
+            "expression": "worried, deep in thought, eyebrows furrowed, eyelids lowered",
+            "pose": {
+                "body": "seated",
+                "arms": {
+                    "right_arm": "elbow bent, fin pressed to closed mouth",
+                    "left_arm": "resting against body or armrest"
+                },
+                "head": "slightly tilted downward"
+            },
+            "environment": "office interior, neutral desk or chair implied"
+        },
+        {
+            "id": "victory_rally_pose",
+            "pose_number": 19,
+            "character": "Bass",
+            "camera": {
+                "view": "front",
+                "framing": "full-body",
+                "angle": "eye-level"
+            },
+            "expression": "confident smirk, proud, eyes forward",
+            "pose": {
+                "body": "standing upright",
+                "arms": {
+                    "left_arm": "extended fully outward",
+                    "right_arm": "extended fully outward"
+                },
+                "chest": "puffed out"
+            },
+            "environment": "stage or conference room, microphone optional"
+        },
+        {
+            "id": "shock_reaction_extreme",
+            "pose_number": 7,
+            "character": "Bass",
+            "camera": {
+                "view": "close-up",
+                "framing": "head and torso",
+                "angle": "eye-level"
+            },
+            "expression": {
+                "mouth": "wide open scream, teeth showing",
+                "eyes": "bulging wide, pupils small",
+                "brows": "arched high",
+                "emotion": "panic / shock"
+            },
+            "pose": {
+                "body": "upright, tense",
+                "arms": "not visible or slightly lifted"
+            },
+            "environment": "underwater background, dramatic bubbles optional"
+        },
+        {
+            "id": "thumbs_up_positive",
+            "pose_number": 18,
+            "character": "Bass",
+            "camera": {
+                "view": "front",
+                "framing": "mid-body",
+                "angle": "eye-level"
+            },
+            "expression": "pleasant smile, relaxed eyelids",
+            "pose": {
+                "body": "standing neutral",
+                "right_arm": "elbow bent, fin giving big thumbs-up equivalent",
+                "left_arm": "down at side or hand in pocket"
+            },
+            "environment": "blank white or simple underwater neutral background"
+        }
+    ]
+}

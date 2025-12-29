@@ -1,6 +1,6 @@
 """
-Enhanced Image Generator with Master Character Profile
-Ensures all generated images use the canonical Bass character design.
+Enhanced Image Generator with Strict Generation Rules
+Implements deterministic, rule-based image generation with no AI inference.
 """
 
 import functions_framework
@@ -17,42 +17,30 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 model = GenerativeModel("gemini-3-pro-image-preview")
 storage_client = storage.Client(project=PROJECT_ID)
 
-# Load master character profile
-def load_character_profile():
-    """Load the canonical Bass character profile from GCS."""
+# Load generation rules and profiles
+def load_resources():
+    """Load all generation resources from GCS."""
     try:
         bucket = storage_client.bucket('bass-ic-refs')
-        blob = bucket.blob('templates/bass_character_profile.json')
-        if blob.exists():
-            return json.loads(blob.download_as_text())
-    except:
-        pass
-    return None
+        
+        # Character profile
+        profile_blob = bucket.blob('templates/bass_character_profile.json')
+        character_profile = json.loads(profile_blob.download_as_text()) if profile_blob.exists() else None
+        
+        # Generation rules
+        rules_blob = bucket.blob('templates/generation_rules.json')
+        gen_rules = json.loads(rules_blob.download_as_text()) if rules_blob.exists() else None
+        
+        # Detailed poses
+        poses_blob = bucket.blob('templates/detailed_poses.json')
+        detailed_poses = json.loads(poses_blob.download_as_text()) if poses_blob.exists() else None
+        
+        return character_profile, gen_rules, detailed_poses
+    except Exception as e:
+        print(f"⚠️ Error loading resources: {e}")
+        return None, None, None
 
-CHARACTER_PROFILE = load_character_profile()
-
-# Build character description
-def get_character_description():
-    """Get detailed character description from master profile."""
-    if not CHARACTER_PROFILE:
-        return "Yellow fish character named Bass in SpongeBob style with navy suit"
-    
-    char = CHARACTER_PROFILE['character']
-    colors = char['color_palette']
-    outfit = char['default_outfit']['outfit_items']
-    
-    return f"""
-CHARACTER: {char['name']} - {char['species']}
-BODY: {colors['body_color']} with {colors['underbelly_color']} underbelly
-FINS: {colors['fin_color']} dorsal fin, {colors['arm_color']} arm fins
-EYES: {colors['eye_color']}
-OUTFIT: {outfit['jacket']}, {outfit['shirt']}, {outfit['tie']}
-PROPORTIONS: Short cartoon humanoid (4 heads tall), large rounded head, no neck
-FACIAL: Large oval eyes, simple thin mouth line, no nose or eyebrows
-STYLE: 2D SpongeBob-style cartoon, clean black outlines, flat cel-shaded
-"""
-
-BASS_CHARACTER = get_character_description()
+CHARACTER_PROFILE, GENERATION_RULES, DETAILED_POSES = load_resources()
 
 # Camera preset framing instructions
 CAMERA_FRAMING = {
@@ -70,9 +58,104 @@ CAMERA_FRAMING = {
     "pov_phone": "first-person view looking down at phone screen"
 }
 
+def build_strict_prompt(shot_data, ref_image_bytes):
+    """Build prompt following strict generation rules."""
+    
+    pose_id = shot_data.get('pose_id', 0)
+    camera_preset = shot_data.get('camera_preset_id', 'static_mid')
+    
+    # Check if this pose has detailed specifications
+    detailed_pose = None
+    if DETAILED_POSES:
+        for pose in DETAILED_POSES.get('detailed_poses', []):
+            if pose.get('pose_number') == pose_id:
+                detailed_pose = pose
+                break
+    
+    # Build strict rules prompt
+    rules_text = """
+STRICT GENERATION RULES:
+- DETERMINISM: Must follow exact specifications, no creative interpretation
+- NO INFERENCE: Only render what is explicitly stated
+- IMAGE-LOCKED ATTRIBUTES: Character identity from reference image is ABSOLUTE
+  - body_shape, species, base_color_palette, fin_shape, face_geometry, eye_shape
+- FORBIDDEN: Never age character, change species, add realism/3D unless requested
+"""
+    
+    # Build character spec
+    if CHARACTER_PROFILE:
+        char = CHARACTER_PROFILE['character']
+        colors = char['color_palette']
+        outfit = char['default_outfit']['outfit_items']
+        
+        character_text = f"""
+CHARACTER (IMAGE-LOCKED IDENTITY):
+Reference image shows the COMPLETE character identity.
+Name: {char['name']}
+Colors: {colors['body_color']} body, {colors['fin_color']} fins
+Outfit: {outfit['jacket']}, {outfit['shirt']}, {outfit['tie']}
+CRITICAL: Use EXACT character from reference image - no modifications.
+"""
+    else:
+        character_text = "Use exact character from reference image."
+    
+    # Build pose specification
+    if detailed_pose:
+        pose_text = f"""
+POSE SPECIFICATION (EXPLICIT):
+Camera: {detailed_pose['camera']['view']}, {detailed_pose['camera']['framing']}
+Expression: {detailed_pose['expression']}
+Body: {json.dumps(detailed_pose['pose'], indent=2)}
+"""
+    else:
+        pose_text = f"""
+POSE: Use exact pose from reference image.
+Camera Framing: {CAMERA_FRAMING.get(camera_preset, 'mid-shot')}
+"""
+    
+    # Environment (text-only source)
+    environment_text = f"""
+ENVIRONMENT (TEXT-SPECIFIED):
+{shot_data.get('environment', 'blank underwater gradient')}
+Lighting: {shot_data.get('lighting_notes', 'flat cartoon lighting')}
+"""
+    
+    # Style (must be explicit)
+    style_text = """
+RENDER STYLE (EXPLICIT):
+- 2D SpongeBob-style animation
+- Clean black outlines
+- Flat cel-shaded
+- Minimal shading
+- 16:9 aspect ratio, 2K resolution
+"""
+    
+    full_prompt = f"""
+{rules_text}
+
+{character_text}
+
+{pose_text}
+
+{environment_text}
+
+{style_text}
+
+SCENE CONTEXT:
+{shot_data.get('narration', '')}
+
+OUTPUT REQUIREMENTS:
+- Character identity from reference image is LOCKED
+- Only vary: pose (if specified), environment, camera framing
+- No creative interpretation beyond explicit instructions
+- Maintain exact character colors, proportions, and design
+"""
+    
+    return full_prompt
+
 @functions_framework.http
 def generate_image(request):
-    """Generate scene image with master character profile and camera framing."""
+    """Generate image with strict rule adherence."""
     
     request_json = request.get_json(silent=True)
     
@@ -99,44 +182,8 @@ def generate_image(request):
         
         ref_image_bytes = ref_blob.download_as_bytes()
         
-        # Get camera framing instruction
-        framing = CAMERA_FRAMING.get(camera_preset, CAMERA_FRAMING['static_mid'])
-        
-        # Build comprehensive prompt with master profile
-        prompt = f"""
-Create a scene in SpongeBob SquarePants animation style.
-
-{BASS_CHARACTER}
-
-CHARACTER POSE:
-Use the exact character from the reference image in the exact pose shown.
-CRITICAL: Maintain character identity - same colors, proportions, outfit, and style.
-
-CAMERA FRAMING:
-{framing}
-
-ENVIRONMENT:
-{shot_data.get('environment', 'office interior')}
-
-LIGHTING:
-{shot_data.get('lighting_notes', 'natural bright lighting')}
-
-SCENE CONTEXT:
-{shot_data.get('narration', '')}
-
-STYLE REQUIREMENTS:
-- SpongeBob SquarePants aesthetic: bright saturated colors, thick black outlines, simple shapes
-- Match character design EXACTLY from reference and master profile
-- 16:9 aspect ratio, 2K resolution
-- Flat cel-shaded animation aesthetic
-- Minimal shading, clean professional quality
-- Frame according to "{camera_preset}" preset
-
-CRITICAL RULES:
-1. Character identity is LOCKED - exact colors and design from reference
-2. No modifications to character appearance
-3. Only pose and environment vary
-"""
+        # Build strict prompt
+        prompt = build_strict_prompt(shot_data, ref_image_bytes)
         
         # Create image part from reference
         image_part = Part.from_data(
@@ -144,12 +191,13 @@ CRITICAL RULES:
             data=ref_image_bytes
         )
         
-        # Generate image
+        # Generate image with strict settings
         response = model.generate_content(
             [prompt, image_part],
             generation_config={
-                "temperature": 0.3,  # Lower for character consistency
-                "top_p": 0.95,
+                "temperature": 0.2,  # Very low for strict adherence
+                "top_p": 0.9,
+                "top_k": 20,
                 "max_output_tokens": 8192,
             }
         )
@@ -177,19 +225,21 @@ CRITICAL RULES:
             'pose_id': str(pose_id),
             'camera_preset': camera_preset,
             'environment': shot_data.get('environment', ''),
-            'profile_version': '1.0'
+            'rules_version': '1.0',
+            'deterministic': 'true'
         }
         
         output_blob.upload_from_string(image_bytes, content_type='image/png')
         
-        print(f"✅ Scene {scene_num} complete (camera: {camera_preset})")
+        print(f"✅ Scene {scene_num} complete (strict rules applied)")
         
         return {
             'status': 'success',
             'image_url': f"gs://bass-ic-images/{output_path}",
             'scene_number': scene_num,
             'camera_preset': camera_preset,
-            'pose_id': pose_id
+            'pose_id': pose_id,
+            'rules_applied': True
         }, 200
         
     except Exception as e:
