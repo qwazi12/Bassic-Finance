@@ -31,10 +31,10 @@ main:
             - log_parse_error:
                 call: sys.log
                 args:
-                  text: '$${"Parse error: " + e.message}'
+                  text: '$${\"Parse error: \" + e.message}'
                   severity: ERROR
             - return_parse_error:
-                return: '$${"Parse failed: " + e.message}'
+                return: '$${\"Parse failed: \" + e.message}'
     
     - extract_parsed_data:
         assign:
@@ -46,7 +46,7 @@ main:
     - log_start:
         call: sys.log
         args:
-          text: '$${"Starting production for episode " + string(episode_number) + ": " + episode_metadata.title}'
+          text: '$${\"Starting production for episode \" + string(episode_number) + \": \" + episode_metadata.title}'
           severity: INFO
     
     # Step 2: Generate images in parallel (batches of 8)
@@ -108,11 +108,10 @@ main:
     - log_media_complete:
         call: sys.log
         args:
-          text: '$${"All images and audio generated for episode " + string(episode_number)}'
+          text: '$${\"All images and audio generated for episode \" + string(episode_number)}'
           severity: INFO
     
     # Step 4: Assemble video
-    # Note: Replace VIDEO_ASSEMBLER_URL with actual URL after deploying video-assembler
     - assemble_video:
         try:
           call: http.post
@@ -124,11 +123,11 @@ main:
               episode_number: ${episode_number}
               episode_title: ${episode_metadata.title}
               images_bucket: "bass-ic-images"
-              images_path: '$${"episode_" + string(episode_number) + "/"}'
+              images_path: '$${\"episode_\" + string(episode_number) + \"/\"}'
               audio_bucket: "bass-ic-audio"
-              audio_path: '$${"episode_" + string(episode_number) + "/"}'
+              audio_path: '$${\"episode_\" + string(episode_number) + \"/\"}'
               output_bucket: "bass-ic-videos"
-              output_filename: ${episode_metadata.title + ".mp4"}
+              output_filename: ${episode_metadata.title + \".mp4\"}
               total_scenes: ${total_scenes}
               duration_per_scene: 5
               fps: 24
@@ -141,44 +140,16 @@ main:
             - log_assembly_error:
                 call: sys.log
                 args:
-                  text: '$${"Video assembly error: " + e.message}'
+                  text: '$${\"Video assembly error: \" + e.message}'
                   severity: ERROR
             - return_assembly_error:
-                return: '$${"Assembly failed: " + e.message}'
+                return: '$${\"Assembly failed: \" + e.message}'
     
     - log_video_complete:
         call: sys.log
         args:
-          text: '$${"Video assembled: " + video_result.body.video_url}'
+          text: '$${\"Video assembled: \" + video_result.body.video_url}'
           severity: INFO
-    
-    # Step 5: Send notification (optional - configure with your webhook)
-    - send_notification:
-        try:
-          call: http.post
-          args:
-            # url: SLACK_WEBHOOK_URL  # Configure your Slack webhook here
-            headers:
-              Content-Type: "application/json"
-            body:
-              text: |
-                ✅ Video Ready: ${episode_metadata.title}
-                
-                📺 Episode #${episode_number}
-                ⏱️ Duration: 8:00 (${total_scenes} scenes)
-                💾 Size: ${video_result.body.video_size_mb} MB
-                ⚡ Processing Time: ${video_result.body.processing_time_seconds}s
-                
-                📁 Location: ${video_result.body.video_url}
-            timeout: 10
-        except:
-          as: e
-          steps:
-            - log_notification_skip:
-                call: sys.log
-                args:
-                  text: "Notification skipped (configure webhook)"
-                  severity: WARNING
     
     # Return final status
     - return_result:
