@@ -52,7 +52,6 @@ main:
     # Step 2: Generate images in parallel (batches of 8)
     - generate_images:
         parallel:
-          shared: [image_results]
           concurrency_limit: 8
           for:
             value: scene
@@ -77,15 +76,10 @@ main:
                       initial_delay: 2
                       max_delay: 60
                       multiplier: 2
-              
-              - store_image_result:
-                  assign:
-                    - image_results[scene.scene_number]: ${image_result.body}
     
     # Step 3: Generate audio in parallel (batches of 12)
     - generate_audio:
         parallel:
-          shared: [audio_results]
           concurrency_limit: 12
           for:
             value: scene
@@ -110,10 +104,6 @@ main:
                       initial_delay: 1
                       max_delay: 30
                       multiplier: 2
-              
-              - store_audio_result:
-                  assign:
-                    - audio_results[scene.scene_number]: ${audio_result.body}
     
     - log_media_complete:
         call: sys.log
