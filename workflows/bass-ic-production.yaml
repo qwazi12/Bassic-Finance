@@ -127,7 +127,7 @@ main:
               audio_bucket: "bass-ic-audio"
               audio_path: '$${\"episode_\" + string(episode_number) + \"/\"}'
               output_bucket: "bass-ic-videos"
-              output_filename: ${episode_metadata.title + \".mp4\"}
+              output_filename: '$${ episode_metadata.title + ".mp4"}'
               total_scenes: ${total_scenes}
               duration_per_scene: 5
               fps: 24
