@@ -31,10 +31,10 @@ main:
             - log_parse_error:
                 call: sys.log
                 args:
-                  text: ${"Parse error: " + e.message}
+                  text: '$${"Parse error: " + e.message}'
                   severity: ERROR
             - return_parse_error:
-                return: ${"Parse failed: " + e.message}
+                return: '$${"Parse failed: " + e.message}'
     
     - extract_parsed_data:
         assign:
@@ -46,7 +46,7 @@ main:
     - log_start:
         call: sys.log
         args:
-          text: ${"Starting production for episode " + string(episode_number) + ": " + episode_metadata.title}
+          text: '$${"Starting production for episode " + string(episode_number) + ": " + episode_metadata.title}'
           severity: INFO
     
     # Step 2: Generate images in parallel (batches of 8)
@@ -118,7 +118,7 @@ main:
     - log_media_complete:
         call: sys.log
         args:
-          text: ${"All images and audio generated for episode " + string(episode_number)}
+          text: '$${"All images and audio generated for episode " + string(episode_number)}'
           severity: INFO
     
     # Step 4: Assemble video
@@ -151,10 +151,10 @@ main:
             - log_assembly_error:
                 call: sys.log
                 args:
-                  text: ${"Video assembly error: " + e.message}
+                  text: '$${"Video assembly error: " + e.message}'
                   severity: ERROR
             - return_assembly_error:
-                return: ${"Assembly failed: " + e.message}
+                return: '$${"Assembly failed: " + e.message}'
     
     - log_video_complete:
         call: sys.log
