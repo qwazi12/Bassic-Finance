@@ -1,0 +1,116 @@
+{
+    "outfit_reference_set": {
+        "character_id": "bass_master_v1",
+        "description": "Neutral full-body outfit variants for Bass. Same identity, stance, and camera; only clothing changes.",
+        "variants": [
+            {
+                "id": "outfit_business_suit_default",
+                "role": "high finance default",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral, weight evenly distributed",
+                    "arms": "relaxed at sides",
+                    "head": "facing forward"
+                },
+                "expression": "neutral",
+                "outfit": {
+                    "jacket": "navy tailored business suit jacket",
+                    "shirt": "white dress shirt",
+                    "tie": "burgundy tie",
+                    "pants": "navy business trousers",
+                    "shoes": "simple cartoon dress shoes (navy or black)"
+                },
+                "environment": "plain flat-color background"
+            },
+            {
+                "id": "outfit_gym_clothes",
+                "role": "workout or morning routine scenes",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed at sides",
+                    "head": "facing forward"
+                },
+                "expression": "neutral or lightly focused",
+                "outfit": {
+                    "top": "sleeveless athletic tank top, navy or dark blue",
+                    "bottom": "knee-length athletic shorts, dark color",
+                    "shoes": "simple cartoon sneakers"
+                },
+                "environment": "plain background (gym context can be added in shot-level JSON)"
+            },
+            {
+                "id": "outfit_pajamas",
+                "role": "waking up at 4:30 AM, sleep scenes",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed",
+                    "head": "forward"
+                },
+                "expression": "neutral or slightly tired",
+                "outfit": {
+                    "top": "simple long-sleeve pajama shirt, light blue",
+                    "bottom": "matching pajama pants, light blue",
+                    "shoes": "no shoes or simple slippers"
+                },
+                "environment": "plain background (bedroom context added per shot)"
+            },
+            {
+                "id": "outfit_swim_trunks",
+                "role": "relaxation / beach / underwater leisure scenes",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed",
+                    "head": "forward"
+                },
+                "expression": "neutral or mild smile",
+                "outfit": {
+                    "bottom": "knee-length swim trunks, teal or turquoise",
+                    "top": "no shirt (body colors unchanged)",
+                    "footwear": "bare cartoon feet or simple sandals"
+                },
+                "environment": "plain background (ocean / beach context added later)"
+            },
+            {
+                "id": "outfit_lab_coat",
+                "role": "analysis scenes, risk, quant-style shots",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed or hands at sides",
+                    "head": "forward"
+                },
+                "expression": "neutral or slightly focused",
+                "outfit": {
+                    "coat": "white lab coat over business shirt",
+                    "underlayer": "light dress shirt, no tie or simple tie",
+                    "pants": "neutral dark trousers",
+                    "shoes": "simple cartoon dress shoes"
+                },
+                "environment": "plain background (charts/monitors added per shot)"
+            }
+        ]
+    }
+}

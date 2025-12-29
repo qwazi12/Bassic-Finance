@@ -1,0 +1,256 @@
+{
+    "expression_reference_set": {
+        "character_id": "bass_master_v1",
+        "description": "Close-up head-and-shoulders expressions for Bass. Identity locked; only emotion varies.",
+        "expressions": [
+            {
+                "id": "face_neutral",
+                "label": "neutral",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "relaxed",
+                    "mouth": "straight line"
+                }
+            },
+            {
+                "id": "face_smile",
+                "label": "small smile",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "softened",
+                    "mouth": "gentle smile"
+                }
+            },
+            {
+                "id": "face_big_smile",
+                "label": "big grin (bonus day)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "wide happy",
+                    "mouth": "large curved excited smile"
+                }
+            },
+            {
+                "id": "face_angry",
+                "label": "angry",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "narrowed",
+                    "mouth": "tight downward line"
+                }
+            },
+            {
+                "id": "face_shocked",
+                "label": "shocked",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "wide open",
+                    "mouth": "round open O shape"
+                }
+            },
+            {
+                "id": "face_sad",
+                "label": "sad",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "drooping",
+                    "mouth": "small frown"
+                }
+            },
+            {
+                "id": "face_smug",
+                "label": "smug / overconfident",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "3/4 front"
+                },
+                "expression": {
+                    "eyes": "half-lidded",
+                    "mouth": "side smirk"
+                }
+            },
+            {
+                "id": "face_tired",
+                "label": "tired",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "half-closed",
+                    "mouth": "soft flat"
+                }
+            },
+            {
+                "id": "face_confused",
+                "label": "confused (Bloomberg not loading)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "one eye half squint, one wide",
+                    "mouth": "crooked uneven line"
+                }
+            },
+            {
+                "id": "face_disbelief",
+                "label": "disbelief (bad news)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "wide and frozen",
+                    "mouth": "slightly open, flat"
+                }
+            },
+            {
+                "id": "face_fake_smile",
+                "label": "forced corporate smile",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "tense, slightly widened",
+                    "mouth": "stretched smile, corners tight"
+                }
+            },
+            {
+                "id": "face_stressed",
+                "label": "stressed, overwhelmed",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "small pupils, darting up",
+                    "mouth": "wobbly line",
+                    "extra": "sweat-drop optional"
+                }
+            },
+            {
+                "id": "face_scared",
+                "label": "fear (market crash)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "very wide",
+                    "mouth": "open, corners pulled back"
+                }
+            },
+            {
+                "id": "face_panicked",
+                "label": "panic (deadline in 3 min)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "wild pupils",
+                    "mouth": "big open scream"
+                }
+            },
+            {
+                "id": "face_wink",
+                "label": "wink (YouTube call-to-action moment)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "3/4"
+                },
+                "expression": {
+                    "eyes": "one eye closed, one eye open",
+                    "mouth": "small playful smile"
+                }
+            },
+            {
+                "id": "face_side_eye",
+                "label": "side-eye meme reaction",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "side glance"
+                },
+                "expression": {
+                    "eyes": "looking sideways only",
+                    "mouth": "flat line skepticism"
+                }
+            },
+            {
+                "id": "face_disgust",
+                "label": "disgust (budget lunch at office)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "slightly squinted",
+                    "mouth": "crumpled downward U shape"
+                }
+            },
+            {
+                "id": "face_proud",
+                "label": "proud (promotion)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "relaxed confidence",
+                    "mouth": "small confident smile"
+                }
+            },
+            {
+                "id": "face_crying",
+                "label": "crying (layoff episode)",
+                "camera": {
+                    "framing": "head-and-shoulders",
+                    "angle": "eye-level",
+                    "view": "front"
+                },
+                "expression": {
+                    "eyes": "tear streams optional",
+                    "mouth": "downturned"
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,96 @@
+{
+    "turnaround_reference_set": {
+        "character_id": "bass_master_v1",
+        "version": "1.0",
+        "description": "Neutral full-body identity turnaround for Bass. Identity-only. No action. No variation. Used to lock anatomy and proportions.",
+        "inherit_from": "bass_master_profile.json",
+        "rules": {
+            "identity_locked": true,
+            "forbidden": [
+                "props",
+                "camera tilt",
+                "emotion",
+                "gesture",
+                "environment details",
+                "perspective distortion"
+            ],
+            "allowed_variation": [],
+            "outfit_policy": {
+                "source": "master_profile_default_outfit",
+                "locked": true,
+                "warning": "Turnaround MUST always show the same suit outfit. No exceptions."
+            }
+        },
+        "views": [
+            {
+                "id": "front_full_body_neutral",
+                "purpose": "primary identity anchor",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "front",
+                    "lens_feel": "orthographic"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed at sides",
+                    "head": "upright, facing forward",
+                    "feet": "flat, evenly spaced"
+                },
+                "expression": "neutral",
+                "environment": "plain flat-color underwater tint"
+            },
+            {
+                "id": "side_full_body_neutral",
+                "purpose": "silhouette + side proportions",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "perfect profile",
+                    "lens_feel": "orthographic"
+                },
+                "pose": {
+                    "body": "upright, neutral",
+                    "arms": "relaxed",
+                    "head": "profile direction"
+                },
+                "expression": "neutral",
+                "environment": "plain flat-color underwater tint"
+            },
+            {
+                "id": "three_quarter_full_body_neutral",
+                "purpose": "depth + volume reference",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "3/4 front",
+                    "lens_feel": "subtle depth but minimal"
+                },
+                "pose": {
+                    "body": "upright neutral",
+                    "arms": "relaxed",
+                    "head": "slightly turned to match 3/4"
+                },
+                "expression": "neutral",
+                "environment": "plain flat-color underwater tint"
+            },
+            {
+                "id": "back_full_body_neutral",
+                "purpose": "fin placement + back of suit",
+                "camera": {
+                    "framing": "full-body",
+                    "angle": "eye-level",
+                    "view_direction": "back",
+                    "lens_feel": "orthographic"
+                },
+                "pose": {
+                    "body": "upright neutral, back toward camera",
+                    "arms": "relaxed",
+                    "head": "facing away"
+                },
+                "expression": "none (not visible)",
+                "environment": "plain flat-color underwater tint"
+            }
+        ]
+    }
+}
