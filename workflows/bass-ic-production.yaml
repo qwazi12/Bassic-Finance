@@ -124,9 +124,9 @@ main:
               episode_number: ${episode_number}
               episode_title: ${episode_metadata.title}
               images_bucket: "bass-ic-images"
-              images_path: ${"episode_" + text.substring(text("000" + string(episode_number)), -3, 3) + "/"}
+              images_path: '$${"episode_" + string(episode_number) + "/"}'
               audio_bucket: "bass-ic-audio"
-              audio_path: ${"episode_" + text.substring(text("000" + string(episode_number)), -3, 3) + "/"}
+              audio_path: '$${"episode_" + string(episode_number) + "/"}'
               output_bucket: "bass-ic-videos"
               output_filename: ${episode_metadata.title + ".mp4"}
               total_scenes: ${total_scenes}
