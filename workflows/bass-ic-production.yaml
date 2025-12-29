@@ -62,7 +62,7 @@ main:
                   try:
                     call: http.post
                     args:
-                      url: https://us-central1-manhwa-engine.cloudfunctions.net/generate-image
+                      url: https://image-generator-nvbatzwjsq-uc.a.run.app/generate-image
                       auth:
                         type: OIDC
                       body:
@@ -127,7 +127,7 @@ main:
         try:
           call: http.post
           args:
-            url: VIDEO_ASSEMBLER_URL/assemble
+            url: https://video-assembler-48189806448.us-central1.run.app/assemble
             auth:
               type: OIDC
             body:
@@ -167,7 +167,7 @@ main:
         try:
           call: http.post
           args:
-            url: SLACK_WEBHOOK_URL
+            # url: SLACK_WEBHOOK_URL  # Configure your Slack webhook here
             headers:
               Content-Type: "application/json"
             body:
