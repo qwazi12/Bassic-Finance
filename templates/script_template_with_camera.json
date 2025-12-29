@@ -1,0 +1,54 @@
+{
+    "video_plan": {
+        "title": "Day in the Life of a Hedge Fund Analyst",
+        "episode_number": 1,
+        "career_type": "hedge_fund",
+        "duration": 480,
+        "total_scenes": 96,
+        "fps": 24,
+        "shots": [
+            {
+                "shot_id": "s01_b01",
+                "scene_number": 1,
+                "timestamp_start_sec": 0.0,
+                "duration_sec": 5.0,
+                "character": "Bass",
+                "pose_id": 16,
+                "camera_preset_id": "slow_push_in",
+                "expression_override": null,
+                "narration": "My alarm goes off at 4:30 AM. Hedge fund life isn't exactly a sleep-friendly career.",
+                "environment": "bedroom_alarm",
+                "lighting_notes": "Blue-tinted early-morning lighting; glow from phone on Bass's face.",
+                "emotion": "NEUTRAL"
+            },
+            {
+                "shot_id": "s01_b02",
+                "scene_number": 2,
+                "timestamp_start_sec": 5.0,
+                "duration_sec": 5.0,
+                "character": "Bass",
+                "pose_id": 5,
+                "camera_preset_id": "static_close",
+                "expression_override": "tired",
+                "narration": "But this is what I signed up for.",
+                "environment": "bathroom_mirror",
+                "lighting_notes": "Bright bathroom fluorescent lighting",
+                "emotion": "TIRED"
+            },
+            {
+                "shot_id": "s01_b03",
+                "scene_number": 3,
+                "timestamp_start_sec": 10.0,
+                "duration_sec": 5.0,
+                "character": "Bass",
+                "pose_id": 15,
+                "camera_preset_id": "pan_left_to_right",
+                "expression_override": null,
+                "narration": "The city is still asleep when I head to the office.",
+                "environment": "city_street_dawn",
+                "lighting_notes": "Orange dawn sky, street lights still on",
+                "emotion": "NEUTRAL"
+            }
+        ]
+    }
+}

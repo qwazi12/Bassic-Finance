@@ -1,6 +1,6 @@
 """
-Image Generator Cloud Function
-Generates scene images using Gemini 3 Pro Image with character references.
+Enhanced Image Generator with Camera Preset Support
+Generates images and applies camera movements based on preset IDs.
 """
 
 import functions_framework
@@ -17,61 +17,82 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 model = GenerativeModel("gemini-3-pro-image-preview")
 storage_client = storage.Client(project=PROJECT_ID)
 
+# Camera preset framing instructions
+CAMERA_FRAMING = {
+    "static_mid": "waist-up mid-shot, character centered, eye-level",
+    "static_close": "close-up on face and shoulders",
+    "static_wide": "full-body shot, show environment context",
+    "slow_push_in": "mid-shot framed for zoom-in animation",
+    "slow_pull_out": "slightly tighter frame for zoom-out animation",
+    "punch_in_reaction": "close framing for dramatic zoom to face",
+    "pan_left_to_right": "wider horizontal frame for left-to-right pan",
+    "pan_right_to_left": "wider horizontal frame for right-to-left pan",
+    "tilt_up": "frame from lower body to face for upward pan",
+    "tilt_down": "frame from face to hands/desk for downward pan",
+    "ots_monitor": "over-the-shoulder view from behind, show computer screens",
+    "pov_phone": "first-person view looking down at phone screen"
+}
+
 @functions_framework.http
 def generate_image(request):
-    """
-    Generate a single scene image using Gemini 3 Pro Image.
-    
-    Expected JSON:
-    {
-      "scene_data": {
-        "character_prompt": "Bass character description",
-        "background_prompt": "Background description",
-        "pose_id": 0,
-        "scene_number": 1
-      },
-      "episode_number": 1
-    }
-    """
+    """Generate scene image with camera preset framing."""
     
     request_json = request.get_json(silent=True)
     
     if not request_json:
         return {'error': 'No JSON payload'}, 400
     
-    scene_data = request_json.get('scene_data', {})
+    shot_data = request_json.get('shot_data', {})
     episode_number = request_json.get('episode_number', 1)
     
-    scene_num = scene_data.get('scene_number', 0)
-    print(f"🎨 Generating scene {scene_num} for episode {episode_number}...")
+    scene_num = shot_data.get('scene_number', 0)
+    pose_id = shot_data.get('pose_id', 0)
+    camera_preset = shot_data.get('camera_preset_id', 'static_mid')
+    
+    print(f"🎨 Generating scene {scene_num} (pose: {pose_id}, camera: {camera_preset})...")
     
     try:
         # Get reference pose from GCS
         ref_bucket = storage_client.bucket('bass-ic-refs')
-        pose_id = scene_data.get('pose_id', 0)
         ref_blob = ref_bucket.blob(f"character_sheet/pose_{pose_id:02d}.png")
         
         if not ref_blob.exists():
-            return {'error': f'Reference pose {pose_id} not found'}, 404
+            print(f"⚠️ Reference pose {pose_id} not found, using default")
+            ref_blob = ref_bucket.blob("character_sheet/pose_00.png")
         
         ref_image_bytes = ref_blob.download_as_bytes()
         
-        # Combine prompts
-        full_prompt = f"""
-Create a scene in SpongeBob SquarePants animation style with these requirements:
+        # Get camera framing instruction
+        framing = CAMERA_FRAMING.get(camera_preset, CAMERA_FRAMING['static_mid'])
+        
+        # Build comprehensive prompt
+        prompt = f"""
+Create a scene in SpongeBob SquarePants animation style.
 
-BACKGROUND: {scene_data.get('background_prompt', 'Simple background')}
+CHARACTER & POSE:
+Use the character (Bass) from the reference image in the exact pose shown.
 
-CHARACTER: {scene_data.get('character_prompt', 'Bass character')}
+CAMERA FRAMING:
+{framing}
+
+ENVIRONMENT:
+{shot_data.get('environment', 'office interior')}
+
+LIGHTING:
+{shot_data.get('lighting_notes', 'natural bright lighting')}
+
+SCENE CONTEXT:
+{shot_data.get('narration', '')}
 
 STYLE REQUIREMENTS:
-- Use the character design from the reference image
-- SpongeBob SquarePants aesthetic: bright colors, thick outlines, simple shapes
+- SpongeBob SquarePants aesthetic: bright saturated colors, thick black outlines, simple shapes
+- Match character design exactly from reference
 - 16:9 aspect ratio
-- High detail, professional animation quality
-- Match the pose and character style from reference
+- 2K resolution
+- Professional animation quality
+- Clear, clean composition suitable for the specified camera framing
 
-Generate at 2K resolution.
+CRITICAL: Frame the shot according to "{camera_preset}" preset ({framing})
 """
         
         # Create image part from reference
@@ -82,7 +103,7 @@ Generate at 2K resolution.
         
         # Generate image
         response = model.generate_content(
-            [full_prompt, image_part],
+            [prompt, image_part],
             generation_config={
                 "temperature": 0.4,
                 "top_p": 0.95,
@@ -101,22 +122,32 @@ Generate at 2K resolution.
                         break
         
         if not image_bytes:
-            return {'error': 'No image generated in response'}, 500
+            return {'error': 'No image generated'}, 500
         
         # Upload to GCS
         output_bucket = storage_client.bucket('bass-ic-images')
         output_path = f"episode_{episode_number:03d}/scene_{scene_num:03d}.png"
         output_blob = output_bucket.blob(output_path)
+        
+        # Store metadata
+        output_blob.metadata = {
+            'pose_id': str(pose_id),
+            'camera_preset': camera_preset,
+            'environment': shot_data.get('environment', '')
+        }
+        
         output_blob.upload_from_string(image_bytes, content_type='image/png')
         
-        print(f"✅ Scene {scene_num} complete: gs://bass-ic-images/{output_path}")
+        print(f"✅ Scene {scene_num} complete (camera: {camera_preset})")
         
         return {
             'status': 'success',
             'image_url': f"gs://bass-ic-images/{output_path}",
-            'scene_number': scene_num
+            'scene_number': scene_num,
+            'camera_preset': camera_preset,
+            'pose_id': pose_id
         }, 200
         
     except Exception as e:
-        print(f"❌ Error generating scene {scene_num}: {str(e)}")
+        print(f"❌ Error: {str(e)}")
         return {'error': str(e), 'scene_number': scene_num}, 500

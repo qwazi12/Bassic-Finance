@@ -1,0 +1,64 @@
+{
+    "camera_presets": [
+        {
+            "id": "static_mid",
+            "description": "Static eye-level mid-shot, Bass from waist up, centered.",
+            "type": "static"
+        },
+        {
+            "id": "static_close",
+            "description": "Static close-up on Bass's face and shoulders for reactions.",
+            "type": "static"
+        },
+        {
+            "id": "static_wide",
+            "description": "Static full-body shot including some environment context.",
+            "type": "static"
+        },
+        {
+            "id": "slow_push_in",
+            "description": "2D slow zoom-in (scale up 105–110% over the clip) for emphasis.",
+            "type": "zoom"
+        },
+        {
+            "id": "slow_pull_out",
+            "description": "2D slow zoom-out (scale down 90–95%) to reveal more context.",
+            "type": "zoom"
+        },
+        {
+            "id": "punch_in_reaction",
+            "description": "Fast zoom-in to Bass's face for comedic or shock reactions.",
+            "type": "zoom"
+        },
+        {
+            "id": "pan_left_to_right",
+            "description": "Horizontal pan from left to right across the still frame.",
+            "type": "pan"
+        },
+        {
+            "id": "pan_right_to_left",
+            "description": "Horizontal pan from right to left across the still frame.",
+            "type": "pan"
+        },
+        {
+            "id": "tilt_up",
+            "description": "Vertical pan from Bass's lower body/desk up to face.",
+            "type": "pan"
+        },
+        {
+            "id": "tilt_down",
+            "description": "Vertical pan from face down to hands/phone/desk.",
+            "type": "pan"
+        },
+        {
+            "id": "ots_monitor",
+            "description": "Over-the-shoulder from behind Bass, looking at a computer screen.",
+            "type": "framing"
+        },
+        {
+            "id": "pov_phone",
+            "description": "First-person POV looking at a phone screen Bass is holding.",
+            "type": "framing"
+        }
+    ]
+}

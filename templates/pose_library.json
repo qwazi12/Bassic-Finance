@@ -1,0 +1,106 @@
+{
+    "character": "Bass",
+    "description": "Yellow fish character with blue dorsal fin, SpongeBob-style line art, blue business suit, white shirt, conservative tie",
+    "pose_library": [
+        {
+            "id": 0,
+            "name": "neutral_standing",
+            "description": "Front view, full body, arms relaxed at sides, calm expression."
+        },
+        {
+            "id": 1,
+            "name": "smile_confident",
+            "description": "Front mid-shot, small confident smile, arms loosely at sides."
+        },
+        {
+            "id": 2,
+            "name": "big_grin_celebrate",
+            "description": "Front full-body, arms raised in a V shape, big excited smile."
+        },
+        {
+            "id": 3,
+            "name": "thinking_fist_to_mouth",
+            "description": "Seated or standing 3/4 view, one fin closed in front of mouth, brows slightly furrowed, deep in thought."
+        },
+        {
+            "id": 4,
+            "name": "worried_hand_on_head",
+            "description": "Front mid-shot, one fin on top of head, eyes slightly wide, mouth tense."
+        },
+        {
+            "id": 5,
+            "name": "stressed_rub_eyes",
+            "description": "Side 3/4 view, one fin rubbing eyes, slouched slightly forward, tired expression."
+        },
+        {
+            "id": 6,
+            "name": "angry_lean_forward",
+            "description": "Front mid-shot, Bass leaning toward camera, brows sharply angled down, mouth open mid-rant, one fin pointing forward."
+        },
+        {
+            "id": 7,
+            "name": "shock_mouth_wide",
+            "description": "Close-up, eyes huge, mouth wide open, fins slightly lifted, strong surprise reaction."
+        },
+        {
+            "id": 8,
+            "name": "sad_slumped",
+            "description": "Front mid-shot, shoulders slumped, eyes downcast, small frown, fins hanging low."
+        },
+        {
+            "id": 9,
+            "name": "desk_typing",
+            "description": "Side 3/4 view, seated at desk, both fins on keyboard, focused neutral expression."
+        },
+        {
+            "id": 10,
+            "name": "desk_looking_at_monitors",
+            "description": "OTS from behind Bass, multiple monitors with charts, Bass sitting upright, focused."
+        },
+        {
+            "id": 11,
+            "name": "phone_to_ear",
+            "description": "Front mid-shot, one fin holding phone to side of head, listening expression."
+        },
+        {
+            "id": 12,
+            "name": "looking_down_at_phone",
+            "description": "3/4 view, Bass seated or standing, both fins holding phone in front of chest, screen glow on face, focused eyes."
+        },
+        {
+            "id": 13,
+            "name": "coffee_mug",
+            "description": "Front mid-shot, one fin holding coffee mug near mouth, slightly tired half-smile."
+        },
+        {
+            "id": 14,
+            "name": "pointing_at_chart",
+            "description": "Side 3/4 view at whiteboard or screen, one fin extended pointing, mouth mid-explanation."
+        },
+        {
+            "id": 15,
+            "name": "walking_side_view",
+            "description": "Profile full-body, one leg forward mid-step, briefcase fin-slung, neutral determined expression."
+        },
+        {
+            "id": 16,
+            "name": "bed_alarm_4_30am",
+            "description": "Side view in bed, Bass lying under blanket, head on pillow, sleepy half-open eyes looking at glowing 4:30 AM phone on nightstand."
+        },
+        {
+            "id": 17,
+            "name": "headshot_neutral",
+            "description": "Tight head-and-shoulders, straight-on, neutral professional expression."
+        },
+        {
+            "id": 18,
+            "name": "thumbs_up",
+            "description": "Front mid-shot, one fin giving a big thumbs-up gesture toward camera, friendly smile."
+        },
+        {
+            "id": 19,
+            "name": "arms_open_presentation",
+            "description": "Front full-body behind simple podium or mic, arms stretched wide, confident motivational expression."
+        }
+    ]
+}
